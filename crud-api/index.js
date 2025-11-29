@@ -1,45 +1,49 @@
-const express = require('express');
-const app = express();
+import Task from "../models/Task.js";   // assume already created
+import express from "express";
 
-app.get("/", (req, res) => {
-    res.send("Hi, server is running");
+const router = express.Router();
+
+router.post("/tasks", async (req, res) => {
+    try {
+        const task = await Task.create(req.body);
+        res.status(201).json(task);
+    }
+    catch (err) {
+
+    }
 });
-
-app.use(express.json());
-
-let users = [
-    { id: 1, name: 'Abhi' },
-    { id: 2, name: 'Ravi' }
-];
-
-// get route
-
-app.get("/users", (req, res) => {
-    res.json(users);
+// read all
+router.get("/tasks", async (req, res) => {
+    try {
+        const tasks = await Task.find();
+        res.json(tasks);
+    }
+    catch (err) {
+        console.log(err.message);
+    }
 })
-// post route
-app.post("/users", (req, res) => {
-    const newUser = { id: Date.now(), ...req.body };
-    users.push(newUser);
-    res.status(201).json(newUser);
+// // update
+router.patch("/tasks/:id", async (req, res) => {
+    try {
+        const updated = await Task.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+        );
+        res.json(updated);
+    }
+    catch (err) {
+
+    }
 });
 
-// put route
-app.put("/users/:id", (req, res) => {
-    const id = parseInt(req.params.id);
-    users = users.map(u => u.id === id ? {...u, ...req.body} : u);
-    res.json({message: 'Updated'});
-});
+router.delete("/tasks/:id", async (req, res) => {
+    try {
+        const deleted = await findByIdAndDelete(req.params.id);
+        if (!deleted)
+            return res.status(404).json({ message: 'Not found' });
+        res.json({message: 'Deleted'});
+    }
+    catch (err) {
 
-// delete route
-app.delete("/users/:id", (req, res) => {
-    const id = parseInt(req.params.id);
-    users = users.filter(u => u.id !== id);
-     res.json({ message: 'Deleted' });
+    }
 })
-
-
-const port = 5000;
-app.listen(port, () => {
-    console.log(`Server is listening on port ${port}`);
-});
