@@ -3,6 +3,7 @@ import express from "express";
 
 const router = express.Router();
 
+// post or create route
 router.post("/tasks", async (req, res) => {
     try {
         const task = await Task.create(req.body);
